@@ -243,36 +243,6 @@
                                         </a>
                                     </li>
                                 @endcan
-                                @can('gate_access')
-                                    <li class="c-sidebar-nav-item">
-                                        <a href="{{ route("admin.gates.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/gates") || request()->is("admin/gates/*") ? "active" : "" }}">
-                                            <i class="fa-fw fas fa-door-closed c-sidebar-nav-icon">
-
-                                            </i>
-                                            {{ trans('cruds.gate.title') }}
-                                        </a>
-                                    </li>
-                                @endcan
-                                @can('history_access')
-                                    <li class="c-sidebar-nav-item">
-                                        <a href="{{ route("admin.histories.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/histories") || request()->is("admin/histories/*") ? "active" : "" }}">
-                                            <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
-
-                                            </i>
-                                            {{ trans('cruds.history.title') }}
-                                        </a>
-                                    </li>
-                                @endcan
-                                @can('qr_access')
-                                    <li class="c-sidebar-nav-item">
-                                        <a href="{{ route("admin.qrs.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/qrs") || request()->is("admin/qrs/*") ? "active" : "" }}">
-                                            <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
-
-                                            </i>
-                                            {{ trans('cruds.qr.title') }}
-                                        </a>
-                                    </li>
-                                @endcan
                             </ul>
                         </li>
                     @endcan
@@ -312,6 +282,80 @@
 
                                             </i>
                                             {{ trans('cruds.defectCategory.title') }}
+                                        </a>
+                                    </li>
+                                @endcan
+                            </ul>
+                        </li>
+                    @endcan
+                    @can('acess_management_access')
+                        <li class="c-sidebar-nav-dropdown">
+                            <a class="c-sidebar-nav-dropdown-toggle" href="#">
+                                <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
+
+                                </i>
+                                {{ trans('cruds.acessManagement.title') }}
+                            </a>
+                            <ul class="c-sidebar-nav-dropdown-items">
+                                @can('gate_access')
+                                    <li class="c-sidebar-nav-item">
+                                        <a href="{{ route("admin.gates.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/gates") || request()->is("admin/gates/*") ? "active" : "" }}">
+                                            <i class="fa-fw fas fa-door-closed c-sidebar-nav-icon">
+
+                                            </i>
+                                            {{ trans('cruds.gate.title') }}
+                                        </a>
+                                    </li>
+                                @endcan
+                                @can('history_access')
+                                    <li class="c-sidebar-nav-item">
+                                        <a href="{{ route("admin.histories.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/histories") || request()->is("admin/histories/*") ? "active" : "" }}">
+                                            <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
+
+                                            </i>
+                                            {{ trans('cruds.history.title') }}
+                                        </a>
+                                    </li>
+                                @endcan
+                                @can('qr_access')
+                                    <li class="c-sidebar-nav-item">
+                                        <a href="{{ route("admin.qrs.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/qrs") || request()->is("admin/qrs/*") ? "active" : "" }}">
+                                            <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
+
+                                            </i>
+                                            {{ trans('cruds.qr.title') }}
+                                        </a>
+                                    </li>
+                                @endcan
+                                @can('location_access')
+                                    <li class="c-sidebar-nav-item">
+                                        <a href="{{ route("admin.locations.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/locations") || request()->is("admin/locations/*") ? "active" : "" }}">
+                                            <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
+
+                                            </i>
+                                            {{ trans('cruds.location.title') }}
+                                        </a>
+                                    </li>
+                                @endcan
+                            </ul>
+                        </li>
+                    @endcan
+                    @can('form_access')
+                        <li class="c-sidebar-nav-dropdown">
+                            <a class="c-sidebar-nav-dropdown-toggle" href="#">
+                                <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
+
+                                </i>
+                                {{ trans('cruds.form.title') }}
+                            </a>
+                            <ul class="c-sidebar-nav-dropdown-items">
+                                @can('form_category_access')
+                                    <li class="c-sidebar-nav-item">
+                                        <a href="{{ route("admin.form-categories.index") }}" class="c-sidebar-nav-link {{ request()->is("admin/form-categories") || request()->is("admin/form-categories/*") ? "active" : "" }}">
+                                            <i class="fa-fw fas fa-cogs c-sidebar-nav-icon">
+
+                                            </i>
+                                            {{ trans('cruds.formCategory.title') }}
                                         </a>
                                     </li>
                                 @endcan

@@ -12,16 +12,60 @@ use App\Models\User;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Yajra\DataTables\Facades\DataTables;
 
 class FacilityBookController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         abort_if(Gate::denies('facility_book_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $facilityBooks = FacilityBook::all();
+        if ($request->ajax()) {
+            $query = FacilityBook::with(['facility', 'user'])->select(sprintf('%s.*', (new FacilityBook)->table));
+            $table = Datatables::of($query);
 
-        return view('admin.facilityBooks.index', compact('facilityBooks'));
+            $table->addColumn('placeholder', '&nbsp;');
+            $table->addColumn('actions', '&nbsp;');
+
+            $table->editColumn('actions', function ($row) {
+                $viewGate      = 'facility_book_show';
+                $editGate      = 'facility_book_edit';
+                $deleteGate    = 'facility_book_delete';
+                $crudRoutePart = 'facility-books';
+
+                return view('partials.datatablesActions', compact(
+                    'viewGate',
+                    'editGate',
+                    'deleteGate',
+                    'crudRoutePart',
+                    'row'
+                ));
+            });
+
+            $table->editColumn('id', function ($row) {
+                return $row->id ? $row->id : "";
+            });
+            $table->addColumn('facility_name', function ($row) {
+                return $row->facility ? $row->facility->name : '';
+            });
+
+            $table->editColumn('facility.available', function ($row) {
+                return $row->facility ? (is_string($row->facility) ? $row->facility : $row->facility->available) : '';
+            });
+
+            $table->editColumn('time', function ($row) {
+                return $row->time ? $row->time : "";
+            });
+            $table->addColumn('user_name', function ($row) {
+                return $row->user ? $row->user->name : '';
+            });
+
+            $table->rawColumns(['actions', 'placeholder', 'facility', 'user']);
+
+            return $table->make(true);
+        }
+
+        return view('admin.facilityBooks.index');
     }
 
     public function create()

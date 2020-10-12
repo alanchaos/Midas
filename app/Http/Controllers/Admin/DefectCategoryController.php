@@ -10,16 +10,49 @@ use App\Models\DefectCategory;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Yajra\DataTables\Facades\DataTables;
 
 class DefectCategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         abort_if(Gate::denies('defect_category_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $defectCategories = DefectCategory::all();
+        if ($request->ajax()) {
+            $query = DefectCategory::query()->select(sprintf('%s.*', (new DefectCategory)->table));
+            $table = Datatables::of($query);
 
-        return view('admin.defectCategories.index', compact('defectCategories'));
+            $table->addColumn('placeholder', '&nbsp;');
+            $table->addColumn('actions', '&nbsp;');
+
+            $table->editColumn('actions', function ($row) {
+                $viewGate      = 'defect_category_show';
+                $editGate      = 'defect_category_edit';
+                $deleteGate    = 'defect_category_delete';
+                $crudRoutePart = 'defect-categories';
+
+                return view('partials.datatablesActions', compact(
+                    'viewGate',
+                    'editGate',
+                    'deleteGate',
+                    'crudRoutePart',
+                    'row'
+                ));
+            });
+
+            $table->editColumn('id', function ($row) {
+                return $row->id ? $row->id : "";
+            });
+            $table->editColumn('defect_cateogry', function ($row) {
+                return $row->defect_cateogry ? $row->defect_cateogry : "";
+            });
+
+            $table->rawColumns(['actions', 'placeholder']);
+
+            return $table->make(true);
+        }
+
+        return view('admin.defectCategories.index');
     }
 
     public function create()

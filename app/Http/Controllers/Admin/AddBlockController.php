@@ -10,16 +10,49 @@ use App\Models\AddBlock;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Yajra\DataTables\Facades\DataTables;
 
 class AddBlockController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         abort_if(Gate::denies('add_block_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $addBlocks = AddBlock::all();
+        if ($request->ajax()) {
+            $query = AddBlock::query()->select(sprintf('%s.*', (new AddBlock)->table));
+            $table = Datatables::of($query);
 
-        return view('admin.addBlocks.index', compact('addBlocks'));
+            $table->addColumn('placeholder', '&nbsp;');
+            $table->addColumn('actions', '&nbsp;');
+
+            $table->editColumn('actions', function ($row) {
+                $viewGate      = 'add_block_show';
+                $editGate      = 'add_block_edit';
+                $deleteGate    = 'add_block_delete';
+                $crudRoutePart = 'add-blocks';
+
+                return view('partials.datatablesActions', compact(
+                    'viewGate',
+                    'editGate',
+                    'deleteGate',
+                    'crudRoutePart',
+                    'row'
+                ));
+            });
+
+            $table->editColumn('id', function ($row) {
+                return $row->id ? $row->id : "";
+            });
+            $table->editColumn('block', function ($row) {
+                return $row->block ? $row->block : "";
+            });
+
+            $table->rawColumns(['actions', 'placeholder']);
+
+            return $table->make(true);
+        }
+
+        return view('admin.addBlocks.index');
     }
 
     public function create()

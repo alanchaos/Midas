@@ -10,16 +10,49 @@ use App\Models\EventCategory;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Yajra\DataTables\Facades\DataTables;
 
 class EventCategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         abort_if(Gate::denies('event_category_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $eventCategories = EventCategory::all();
+        if ($request->ajax()) {
+            $query = EventCategory::query()->select(sprintf('%s.*', (new EventCategory)->table));
+            $table = Datatables::of($query);
 
-        return view('admin.eventCategories.index', compact('eventCategories'));
+            $table->addColumn('placeholder', '&nbsp;');
+            $table->addColumn('actions', '&nbsp;');
+
+            $table->editColumn('actions', function ($row) {
+                $viewGate      = 'event_category_show';
+                $editGate      = 'event_category_edit';
+                $deleteGate    = 'event_category_delete';
+                $crudRoutePart = 'event-categories';
+
+                return view('partials.datatablesActions', compact(
+                    'viewGate',
+                    'editGate',
+                    'deleteGate',
+                    'crudRoutePart',
+                    'row'
+                ));
+            });
+
+            $table->editColumn('id', function ($row) {
+                return $row->id ? $row->id : "";
+            });
+            $table->editColumn('cateogey', function ($row) {
+                return $row->cateogey ? $row->cateogey : "";
+            });
+
+            $table->rawColumns(['actions', 'placeholder']);
+
+            return $table->make(true);
+        }
+
+        return view('admin.eventCategories.index');
     }
 
     public function create()

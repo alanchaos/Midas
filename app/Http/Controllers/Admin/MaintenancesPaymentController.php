@@ -14,18 +14,67 @@ use Gate;
 use Illuminate\Http\Request;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Symfony\Component\HttpFoundation\Response;
+use Yajra\DataTables\Facades\DataTables;
 
 class MaintenancesPaymentController extends Controller
 {
     use MediaUploadingTrait;
 
-    public function index()
+    public function index(Request $request)
     {
         abort_if(Gate::denies('maintenances_payment_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $maintenancesPayments = MaintenancesPayment::all();
+        if ($request->ajax()) {
+            $query = MaintenancesPayment::with(['username', 'payment_method'])->select(sprintf('%s.*', (new MaintenancesPayment)->table));
+            $table = Datatables::of($query);
 
-        return view('admin.maintenancesPayments.index', compact('maintenancesPayments'));
+            $table->addColumn('placeholder', '&nbsp;');
+            $table->addColumn('actions', '&nbsp;');
+
+            $table->editColumn('actions', function ($row) {
+                $viewGate      = 'maintenances_payment_show';
+                $editGate      = 'maintenances_payment_edit';
+                $deleteGate    = 'maintenances_payment_delete';
+                $crudRoutePart = 'maintenances-payments';
+
+                return view('partials.datatablesActions', compact(
+                    'viewGate',
+                    'editGate',
+                    'deleteGate',
+                    'crudRoutePart',
+                    'row'
+                ));
+            });
+
+            $table->editColumn('id', function ($row) {
+                return $row->id ? $row->id : "";
+            });
+            $table->addColumn('username_username', function ($row) {
+                return $row->username ? $row->username->username : '';
+            });
+
+            $table->editColumn('amount', function ($row) {
+                return $row->amount ? $row->amount : "";
+            });
+            $table->editColumn('month', function ($row) {
+                return $row->month ? $row->month : "";
+            });
+            $table->editColumn('receipt', function ($row) {
+                return $row->receipt ? '<a href="' . $row->receipt->getUrl() . '" target="_blank">' . trans('global.downloadFile') . '</a>' : '';
+            });
+            $table->editColumn('status', function ($row) {
+                return $row->status ? MaintenancesPayment::STATUS_SELECT[$row->status] : '';
+            });
+            $table->addColumn('payment_method_method', function ($row) {
+                return $row->payment_method ? $row->payment_method->method : '';
+            });
+
+            $table->rawColumns(['actions', 'placeholder', 'username', 'receipt', 'payment_method']);
+
+            return $table->make(true);
+        }
+
+        return view('admin.maintenancesPayments.index');
     }
 
     public function create()

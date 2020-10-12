@@ -197,6 +197,8 @@ return [
             'updated_at_helper' => ' ',
             'deleted_at'        => 'Deleted at',
             'deleted_at_helper' => ' ',
+            'spa'               => 'Spa',
+            'spa_helper'        => ' ',
         ],
     ],
     'addFamilyMember'     => [
@@ -325,6 +327,8 @@ return [
             'updated_at_helper'  => ' ',
             'deleted_at'         => 'Deleted at',
             'deleted_at_helper'  => ' ',
+            'location'           => 'Location',
+            'location_helper'    => ' ',
         ],
     ],
     'history'             => [
@@ -676,5 +680,73 @@ return [
     'point'               => [
         'title'          => 'Point',
         'title_singular' => 'Point',
+    ],
+    'acessManagement'     => [
+        'title'          => 'Acess Management',
+        'title_singular' => 'Acess Management',
+    ],
+    'form'                => [
+        'title'          => 'Form',
+        'title_singular' => 'Form',
+    ],
+    'formCategory'        => [
+        'title'          => 'Form Category',
+        'title_singular' => 'Form Category',
+        'fields'         => [
+            'id'                => 'ID',
+            'id_helper'         => ' ',
+            'category'          => 'Category',
+            'category_helper'   => ' ',
+            'created_at'        => 'Created at',
+            'created_at_helper' => ' ',
+            'updated_at'        => 'Updated at',
+            'updated_at_helper' => ' ',
+            'deleted_at'        => 'Deleted at',
+            'deleted_at_helper' => ' ',
+        ],
+    ],
+    'location'            => [
+        'title'          => 'Location',
+        'title_singular' => 'Location',
+        'fields'         => [
+            'id'                => 'ID',
+            'id_helper'         => ' ',
+            'location'          => 'Location',
+            'location_helper'   => ' ',
+            'created_at'        => 'Created at',
+            'created_at_helper' => ' ',
+            'updated_at'        => 'Updated at',
+            'updated_at_helper' => ' ',
+            'deleted_at'        => 'Deleted at',
+            'deleted_at_helper' => ' ',
+        ],
+    ],
+    'voucher'             => [
+        'title'          => 'Voucher',
+        'title_singular' => 'Voucher',
+    ],
+    'membership'          => [
+        'title'          => 'Membership',
+        'title_singular' => 'Membership',
+    ],
+    'item'                => [
+        'title'          => 'Item',
+        'title_singular' => 'Item',
+    ],
+    'order'               => [
+        'title'          => 'Order',
+        'title_singular' => 'Order',
+    ],
+    'report'              => [
+        'title'          => 'Report',
+        'title_singular' => 'Report',
+    ],
+    'security'            => [
+        'title'          => 'Security',
+        'title_singular' => 'Security',
+    ],
+    'systemSetting'       => [
+        'title'          => 'System Setting',
+        'title_singular' => 'System Setting',
     ],
 ];

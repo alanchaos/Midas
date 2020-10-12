@@ -12,16 +12,74 @@ use App\Models\Role;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Yajra\DataTables\Facades\DataTables;
 
 class EventControlController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         abort_if(Gate::denies('event_control_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $eventControls = EventControl::all();
+        if ($request->ajax()) {
+            $query = EventControl::with(['category', 'audience_groups'])->select(sprintf('%s.*', (new EventControl)->table));
+            $table = Datatables::of($query);
 
-        return view('admin.eventControls.index', compact('eventControls'));
+            $table->addColumn('placeholder', '&nbsp;');
+            $table->addColumn('actions', '&nbsp;');
+
+            $table->editColumn('actions', function ($row) {
+                $viewGate      = 'event_control_show';
+                $editGate      = 'event_control_edit';
+                $deleteGate    = 'event_control_delete';
+                $crudRoutePart = 'event-controls';
+
+                return view('partials.datatablesActions', compact(
+                    'viewGate',
+                    'editGate',
+                    'deleteGate',
+                    'crudRoutePart',
+                    'row'
+                ));
+            });
+
+            $table->editColumn('id', function ($row) {
+                return $row->id ? $row->id : "";
+            });
+            $table->editColumn('title', function ($row) {
+                return $row->title ? $row->title : "";
+            });
+            $table->addColumn('category_cateogey', function ($row) {
+                return $row->category ? $row->category->cateogey : '';
+            });
+
+            $table->editColumn('time', function ($row) {
+                return $row->time ? $row->time : "";
+            });
+            $table->editColumn('audience_group', function ($row) {
+                $labels = [];
+
+                foreach ($row->audience_groups as $audience_group) {
+                    $labels[] = sprintf('<span class="label label-info label-many">%s</span>', $audience_group->title);
+                }
+
+                return implode(' ', $labels);
+            });
+            $table->editColumn('payment', function ($row) {
+                return $row->payment ? $row->payment : "";
+            });
+            $table->editColumn('participants', function ($row) {
+                return $row->participants ? $row->participants : "";
+            });
+            $table->editColumn('status', function ($row) {
+                return $row->status ? $row->status : "";
+            });
+
+            $table->rawColumns(['actions', 'placeholder', 'category', 'audience_group']);
+
+            return $table->make(true);
+        }
+
+        return view('admin.eventControls.index');
     }
 
     public function create()

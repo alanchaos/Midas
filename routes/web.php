@@ -47,6 +47,8 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
 
     // Unit Managements
     Route::delete('unit-managements/destroy', 'UnitManagementController@massDestroy')->name('unit-managements.massDestroy');
+    Route::post('unit-managements/media', 'UnitManagementController@storeMedia')->name('unit-managements.storeMedia');
+    Route::post('unit-managements/ckmedia', 'UnitManagementController@storeCKEditorImages')->name('unit-managements.storeCKEditorImages');
     Route::resource('unit-managements', 'UnitManagementController');
 
     // Add Family Members
@@ -154,6 +156,14 @@ Route::group(['prefix' => 'admin', 'as' => 'admin.', 'namespace' => 'Admin', 'mi
     // Feedback Categories
     Route::delete('feedback-categories/destroy', 'FeedbackCategoryController@massDestroy')->name('feedback-categories.massDestroy');
     Route::resource('feedback-categories', 'FeedbackCategoryController');
+
+    // Form Categories
+    Route::delete('form-categories/destroy', 'FormCategoryController@massDestroy')->name('form-categories.massDestroy');
+    Route::resource('form-categories', 'FormCategoryController');
+
+    // Locations
+    Route::delete('locations/destroy', 'LocationController@massDestroy')->name('locations.massDestroy');
+    Route::resource('locations', 'LocationController');
 
     Route::get('messenger', 'MessengerController@index')->name('messenger.index');
     Route::get('messenger/create', 'MessengerController@createTopic')->name('messenger.createTopic');

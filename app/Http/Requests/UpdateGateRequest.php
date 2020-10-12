@@ -24,6 +24,10 @@ class UpdateGateRequest extends FormRequest
                 'string',
                 'nullable',
             ],
+            'location_id' => [
+                'required',
+                'integer',
+            ],
         ];
     }
 }

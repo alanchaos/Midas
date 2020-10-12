@@ -53,6 +53,17 @@
                 <span class="help-block">{{ trans('cruds.unitManagement.fields.status_helper') }}</span>
             </div>
             <div class="form-group">
+                <label for="spa">{{ trans('cruds.unitManagement.fields.spa') }}</label>
+                <div class="needsclick dropzone {{ $errors->has('spa') ? 'is-invalid' : '' }}" id="spa-dropzone">
+                </div>
+                @if($errors->has('spa'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('spa') }}
+                    </div>
+                @endif
+                <span class="help-block">{{ trans('cruds.unitManagement.fields.spa_helper') }}</span>
+            </div>
+            <div class="form-group">
                 <button class="btn btn-danger" type="submit">
                     {{ trans('global.save') }}
                 </button>
@@ -63,4 +74,57 @@
 
 
 
+@endsection
+
+@section('scripts')
+<script>
+    Dropzone.options.spaDropzone = {
+    url: '{{ route('admin.unit-managements.storeMedia') }}',
+    maxFilesize: 2, // MB
+    maxFiles: 1,
+    addRemoveLinks: true,
+    headers: {
+      'X-CSRF-TOKEN': "{{ csrf_token() }}"
+    },
+    params: {
+      size: 2
+    },
+    success: function (file, response) {
+      $('form').find('input[name="spa"]').remove()
+      $('form').append('<input type="hidden" name="spa" value="' + response.name + '">')
+    },
+    removedfile: function (file) {
+      file.previewElement.remove()
+      if (file.status !== 'error') {
+        $('form').find('input[name="spa"]').remove()
+        this.options.maxFiles = this.options.maxFiles + 1
+      }
+    },
+    init: function () {
+@if(isset($unitManagement) && $unitManagement->spa)
+      var file = {!! json_encode($unitManagement->spa) !!}
+          this.options.addedfile.call(this, file)
+      file.previewElement.classList.add('dz-complete')
+      $('form').append('<input type="hidden" name="spa" value="' + file.file_name + '">')
+      this.options.maxFiles = this.options.maxFiles - 1
+@endif
+    },
+     error: function (file, response) {
+         if ($.type(response) === 'string') {
+             var message = response //dropzone sends it's own error messages in string
+         } else {
+             var message = response.errors.file
+         }
+         file.previewElement.classList.add('dz-error')
+         _ref = file.previewElement.querySelectorAll('[data-dz-errormessage]')
+         _results = []
+         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+             node = _ref[_i]
+             _results.push(node.textContent = message)
+         }
+
+         return _results
+     }
+}
+</script>
 @endsection

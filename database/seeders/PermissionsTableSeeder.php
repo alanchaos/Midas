@@ -636,6 +636,82 @@ class PermissionsTableSeeder extends Seeder
             ],
             [
                 'id'    => 157,
+                'title' => 'acess_management_access',
+            ],
+            [
+                'id'    => 158,
+                'title' => 'form_access',
+            ],
+            [
+                'id'    => 159,
+                'title' => 'form_category_create',
+            ],
+            [
+                'id'    => 160,
+                'title' => 'form_category_edit',
+            ],
+            [
+                'id'    => 161,
+                'title' => 'form_category_show',
+            ],
+            [
+                'id'    => 162,
+                'title' => 'form_category_delete',
+            ],
+            [
+                'id'    => 163,
+                'title' => 'form_category_access',
+            ],
+            [
+                'id'    => 164,
+                'title' => 'location_create',
+            ],
+            [
+                'id'    => 165,
+                'title' => 'location_edit',
+            ],
+            [
+                'id'    => 166,
+                'title' => 'location_show',
+            ],
+            [
+                'id'    => 167,
+                'title' => 'location_delete',
+            ],
+            [
+                'id'    => 168,
+                'title' => 'location_access',
+            ],
+            [
+                'id'    => 169,
+                'title' => 'voucher_access',
+            ],
+            [
+                'id'    => 170,
+                'title' => 'membership_access',
+            ],
+            [
+                'id'    => 171,
+                'title' => 'item_access',
+            ],
+            [
+                'id'    => 172,
+                'title' => 'order_access',
+            ],
+            [
+                'id'    => 173,
+                'title' => 'report_access',
+            ],
+            [
+                'id'    => 174,
+                'title' => 'security_access',
+            ],
+            [
+                'id'    => 175,
+                'title' => 'system_setting_access',
+            ],
+            [
+                'id'    => 176,
                 'title' => 'profile_password_edit',
             ],
         ];

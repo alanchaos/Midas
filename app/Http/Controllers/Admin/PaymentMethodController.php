@@ -10,16 +10,55 @@ use App\Models\PaymentMethod;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Yajra\DataTables\Facades\DataTables;
 
 class PaymentMethodController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         abort_if(Gate::denies('payment_method_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $paymentMethods = PaymentMethod::all();
+        if ($request->ajax()) {
+            $query = PaymentMethod::query()->select(sprintf('%s.*', (new PaymentMethod)->table));
+            $table = Datatables::of($query);
 
-        return view('admin.paymentMethods.index', compact('paymentMethods'));
+            $table->addColumn('placeholder', '&nbsp;');
+            $table->addColumn('actions', '&nbsp;');
+
+            $table->editColumn('actions', function ($row) {
+                $viewGate      = 'payment_method_show';
+                $editGate      = 'payment_method_edit';
+                $deleteGate    = 'payment_method_delete';
+                $crudRoutePart = 'payment-methods';
+
+                return view('partials.datatablesActions', compact(
+                    'viewGate',
+                    'editGate',
+                    'deleteGate',
+                    'crudRoutePart',
+                    'row'
+                ));
+            });
+
+            $table->editColumn('id', function ($row) {
+                return $row->id ? $row->id : "";
+            });
+            $table->editColumn('method', function ($row) {
+                return $row->method ? $row->method : "";
+            });
+            $table->editColumn('status', function ($row) {
+                return $row->status ? $row->status : "";
+            });
+            $table->editColumn('description', function ($row) {
+                return $row->description ? $row->description : "";
+            });
+
+            $table->rawColumns(['actions', 'placeholder']);
+
+            return $table->make(true);
+        }
+
+        return view('admin.paymentMethods.index');
     }
 
     public function create()

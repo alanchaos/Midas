@@ -31,6 +31,9 @@
                         {{ trans('cruds.gate.fields.last_active') }}
                     </th>
                     <th>
+                        {{ trans('cruds.gate.fields.location') }}
+                    </th>
+                    <th>
                         &nbsp;
                     </th>
                 </tr>
@@ -89,6 +92,7 @@
 { data: 'id', name: 'id' },
 { data: 'name', name: 'name' },
 { data: 'last_active', name: 'last_active' },
+{ data: 'location_location', name: 'location.location' },
 { data: 'actions', name: '{{ trans('global.actions') }}' }
     ],
     orderCellsTop: true,
