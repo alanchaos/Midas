@@ -15,88 +15,36 @@
     </div>
 
     <div class="card-body">
-        <div class="table-responsive">
-            <table class=" table table-bordered table-striped table-hover datatable datatable-FacilityBook">
-                <thead>
-                    <tr>
-                        <th width="10">
+        <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-FacilityBook">
+            <thead>
+                <tr>
+                    <th width="10">
 
-                        </th>
-                        <th>
-                            {{ trans('cruds.facilityBook.fields.id') }}
-                        </th>
-                        <th>
-                            {{ trans('cruds.facilityBook.fields.facility') }}
-                        </th>
-                        <th>
-                            {{ trans('cruds.facilityManagement.fields.available') }}
-                        </th>
-                        <th>
-                            {{ trans('cruds.facilityBook.fields.date') }}
-                        </th>
-                        <th>
-                            {{ trans('cruds.facilityBook.fields.time') }}
-                        </th>
-                        <th>
-                            {{ trans('cruds.facilityBook.fields.user') }}
-                        </th>
-                        <th>
-                            &nbsp;
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($facilityBooks as $key => $facilityBook)
-                        <tr data-entry-id="{{ $facilityBook->id }}">
-                            <td>
-
-                            </td>
-                            <td>
-                                {{ $facilityBook->id ?? '' }}
-                            </td>
-                            <td>
-                                {{ $facilityBook->facility->name ?? '' }}
-                            </td>
-                            <td>
-                                {{ $facilityBook->facility->available ?? '' }}
-                            </td>
-                            <td>
-                                {{ $facilityBook->date ?? '' }}
-                            </td>
-                            <td>
-                                {{ $facilityBook->time ?? '' }}
-                            </td>
-                            <td>
-                                {{ $facilityBook->user->name ?? '' }}
-                            </td>
-                            <td>
-                                @can('facility_book_show')
-                                    <a class="btn btn-xs btn-primary" href="{{ route('admin.facility-books.show', $facilityBook->id) }}">
-                                        {{ trans('global.view') }}
-                                    </a>
-                                @endcan
-
-                                @can('facility_book_edit')
-                                    <a class="btn btn-xs btn-info" href="{{ route('admin.facility-books.edit', $facilityBook->id) }}">
-                                        {{ trans('global.edit') }}
-                                    </a>
-                                @endcan
-
-                                @can('facility_book_delete')
-                                    <form action="{{ route('admin.facility-books.destroy', $facilityBook->id) }}" method="POST" onsubmit="return confirm('{{ trans('global.areYouSure') }}');" style="display: inline-block;">
-                                        <input type="hidden" name="_method" value="DELETE">
-                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                        <input type="submit" class="btn btn-xs btn-danger" value="{{ trans('global.delete') }}">
-                                    </form>
-                                @endcan
-
-                            </td>
-
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                    </th>
+                    <th>
+                        {{ trans('cruds.facilityBook.fields.id') }}
+                    </th>
+                    <th>
+                        {{ trans('cruds.facilityBook.fields.facility') }}
+                    </th>
+                    <th>
+                        {{ trans('cruds.facilityManagement.fields.available') }}
+                    </th>
+                    <th>
+                        {{ trans('cruds.facilityBook.fields.date') }}
+                    </th>
+                    <th>
+                        {{ trans('cruds.facilityBook.fields.time') }}
+                    </th>
+                    <th>
+                        {{ trans('cruds.facilityBook.fields.user') }}
+                    </th>
+                    <th>
+                        &nbsp;
+                    </th>
+                </tr>
+            </thead>
+        </table>
     </div>
 </div>
 
@@ -109,14 +57,14 @@
     $(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
 @can('facility_book_delete')
-  let deleteButtonTrans = '{{ trans('global.datatables.delete') }}'
+  let deleteButtonTrans = '{{ trans('global.datatables.delete') }}';
   let deleteButton = {
     text: deleteButtonTrans,
     url: "{{ route('admin.facility-books.massDestroy') }}",
     className: 'btn-danger',
     action: function (e, dt, node, config) {
-      var ids = $.map(dt.rows({ selected: true }).nodes(), function (entry) {
-          return $(entry).data('entry-id')
+      var ids = $.map(dt.rows({ selected: true }).data(), function (entry) {
+          return entry.id
       });
 
       if (ids.length === 0) {
@@ -138,18 +86,34 @@
   dtButtons.push(deleteButton)
 @endcan
 
-  $.extend(true, $.fn.dataTable.defaults, {
+  let dtOverrideGlobals = {
+    buttons: dtButtons,
+    processing: true,
+    serverSide: true,
+    retrieve: true,
+    aaSorting: [],
+    ajax: "{{ route('admin.facility-books.index') }}",
+    columns: [
+      { data: 'placeholder', name: 'placeholder' },
+{ data: 'id', name: 'id' },
+{ data: 'facility_name', name: 'facility.name' },
+{ data: 'facility.available', name: 'facility.available' },
+{ data: 'date', name: 'date' },
+{ data: 'time', name: 'time' },
+{ data: 'user_name', name: 'user.name' },
+{ data: 'actions', name: '{{ trans('global.actions') }}' }
+    ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
     pageLength: 100,
-  });
-  let table = $('.datatable-FacilityBook:not(.ajaxTable)').DataTable({ buttons: dtButtons })
+  };
+  let table = $('.datatable-FacilityBook').DataTable(dtOverrideGlobals);
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
   
-})
+});
 
 </script>
 @endsection

@@ -7,6 +7,7 @@ use App\Http\Requests\MassDestroyGateRequest;
 use App\Http\Requests\StoreGateRequest;
 use App\Http\Requests\UpdateGateRequest;
 use App\Models\Gate;
+use App\Models\Location;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +20,7 @@ class GateController extends Controller
         abort_if(Gate::denies('gate_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         if ($request->ajax()) {
-            $query = Gate::query()->select(sprintf('%s.*', (new Gate)->table));
+            $query = Gate::with(['location'])->select(sprintf('%s.*', (new Gate)->table));
             $table = Datatables::of($query);
 
             $table->addColumn('placeholder', '&nbsp;');
@@ -49,8 +50,11 @@ class GateController extends Controller
             $table->editColumn('last_active', function ($row) {
                 return $row->last_active ? $row->last_active : "";
             });
+            $table->addColumn('location_location', function ($row) {
+                return $row->location ? $row->location->location : '';
+            });
 
-            $table->rawColumns(['actions', 'placeholder']);
+            $table->rawColumns(['actions', 'placeholder', 'location']);
 
             return $table->make(true);
         }
@@ -62,7 +66,9 @@ class GateController extends Controller
     {
         abort_if(Gate::denies('gate_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.gates.create');
+        $locations = Location::all()->pluck('location', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        return view('admin.gates.create', compact('locations'));
     }
 
     public function store(StoreGateRequest $request)
@@ -76,7 +82,11 @@ class GateController extends Controller
     {
         abort_if(Gate::denies('gate_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return view('admin.gates.edit', compact('gate'));
+        $locations = Location::all()->pluck('location', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $gate->load('location');
+
+        return view('admin.gates.edit', compact('locations', 'gate'));
     }
 
     public function update(UpdateGateRequest $request, Gate $gate)
@@ -89,6 +99,8 @@ class GateController extends Controller
     public function show(Gate $gate)
     {
         abort_if(Gate::denies('gate_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $gate->load('location');
 
         return view('admin.gates.show', compact('gate'));
     }

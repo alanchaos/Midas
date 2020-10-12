@@ -15,18 +15,72 @@ use Gate;
 use Illuminate\Http\Request;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Symfony\Component\HttpFoundation\Response;
+use Yajra\DataTables\Facades\DataTables;
 
 class FacilityPaymentController extends Controller
 {
     use MediaUploadingTrait;
 
-    public function index()
+    public function index(Request $request)
     {
         abort_if(Gate::denies('facility_payment_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $facilityPayments = FacilityPayment::all();
+        if ($request->ajax()) {
+            $query = FacilityPayment::with(['facility', 'username', 'payment_method'])->select(sprintf('%s.*', (new FacilityPayment)->table));
+            $table = Datatables::of($query);
 
-        return view('admin.facilityPayments.index', compact('facilityPayments'));
+            $table->addColumn('placeholder', '&nbsp;');
+            $table->addColumn('actions', '&nbsp;');
+
+            $table->editColumn('actions', function ($row) {
+                $viewGate      = 'facility_payment_show';
+                $editGate      = 'facility_payment_edit';
+                $deleteGate    = 'facility_payment_delete';
+                $crudRoutePart = 'facility-payments';
+
+                return view('partials.datatablesActions', compact(
+                    'viewGate',
+                    'editGate',
+                    'deleteGate',
+                    'crudRoutePart',
+                    'row'
+                ));
+            });
+
+            $table->editColumn('id', function ($row) {
+                return $row->id ? $row->id : "";
+            });
+            $table->addColumn('facility_name', function ($row) {
+                return $row->facility ? $row->facility->name : '';
+            });
+
+            $table->addColumn('username_username', function ($row) {
+                return $row->username ? $row->username->username : '';
+            });
+
+            $table->editColumn('username.username', function ($row) {
+                return $row->username ? (is_string($row->username) ? $row->username : $row->username->username) : '';
+            });
+            $table->editColumn('amount', function ($row) {
+                return $row->amount ? $row->amount : "";
+            });
+            $table->addColumn('payment_method_method', function ($row) {
+                return $row->payment_method ? $row->payment_method->method : '';
+            });
+
+            $table->editColumn('reciept', function ($row) {
+                return $row->reciept ? '<a href="' . $row->reciept->getUrl() . '" target="_blank">' . trans('global.downloadFile') . '</a>' : '';
+            });
+            $table->editColumn('status', function ($row) {
+                return $row->status ? FacilityPayment::STATUS_SELECT[$row->status] : '';
+            });
+
+            $table->rawColumns(['actions', 'placeholder', 'facility', 'username', 'payment_method', 'reciept']);
+
+            return $table->make(true);
+        }
+
+        return view('admin.facilityPayments.index');
     }
 
     public function create()

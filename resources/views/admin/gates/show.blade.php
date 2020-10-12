@@ -39,6 +39,14 @@
                             {{ $gate->last_active }}
                         </td>
                     </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.gate.fields.location') }}
+                        </th>
+                        <td>
+                            {{ $gate->location->location ?? '' }}
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <div class="form-group">

@@ -22,6 +22,7 @@ class Gate extends Model
     protected $fillable = [
         'name',
         'last_active',
+        'location_id',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -30,5 +31,10 @@ class Gate extends Model
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class, 'location_id');
     }
 }

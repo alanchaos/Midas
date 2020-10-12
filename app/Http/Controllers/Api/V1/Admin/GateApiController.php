@@ -16,7 +16,7 @@ class GateApiController extends Controller
     {
         abort_if(Gate::denies('gate_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return new GateResource(Gate::all());
+        return new GateResource(Gate::with(['location'])->get());
     }
 
     public function store(StoreGateRequest $request)
@@ -32,7 +32,7 @@ class GateApiController extends Controller
     {
         abort_if(Gate::denies('gate_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        return new GateResource($gate);
+        return new GateResource($gate->load(['location']));
     }
 
     public function update(UpdateGateRequest $request, Gate $gate)

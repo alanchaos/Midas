@@ -17,6 +17,7 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin', '
     Route::apiResource('add-blocks', 'AddBlockApiController');
 
     // Unit Managements
+    Route::post('unit-managements/media', 'UnitManagementApiController@storeMedia')->name('unit-managements.storeMedia');
     Route::apiResource('unit-managements', 'UnitManagementApiController');
 
     // Facility Categories
@@ -80,4 +81,10 @@ Route::group(['prefix' => 'v1', 'as' => 'api.', 'namespace' => 'Api\V1\Admin', '
 
     // Feedback Categories
     Route::apiResource('feedback-categories', 'FeedbackCategoryApiController');
+
+    // Form Categories
+    Route::apiResource('form-categories', 'FormCategoryApiController');
+
+    // Locations
+    Route::apiResource('locations', 'LocationApiController');
 });

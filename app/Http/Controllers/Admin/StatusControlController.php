@@ -10,16 +10,52 @@ use App\Models\StatusControl;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Yajra\DataTables\Facades\DataTables;
 
 class StatusControlController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         abort_if(Gate::denies('status_control_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $statusControls = StatusControl::all();
+        if ($request->ajax()) {
+            $query = StatusControl::query()->select(sprintf('%s.*', (new StatusControl)->table));
+            $table = Datatables::of($query);
 
-        return view('admin.statusControls.index', compact('statusControls'));
+            $table->addColumn('placeholder', '&nbsp;');
+            $table->addColumn('actions', '&nbsp;');
+
+            $table->editColumn('actions', function ($row) {
+                $viewGate      = 'status_control_show';
+                $editGate      = 'status_control_edit';
+                $deleteGate    = 'status_control_delete';
+                $crudRoutePart = 'status-controls';
+
+                return view('partials.datatablesActions', compact(
+                    'viewGate',
+                    'editGate',
+                    'deleteGate',
+                    'crudRoutePart',
+                    'row'
+                ));
+            });
+
+            $table->editColumn('id', function ($row) {
+                return $row->id ? $row->id : "";
+            });
+            $table->editColumn('status', function ($row) {
+                return $row->status ? $row->status : "";
+            });
+            $table->editColumn('desctiption', function ($row) {
+                return $row->desctiption ? $row->desctiption : "";
+            });
+
+            $table->rawColumns(['actions', 'placeholder']);
+
+            return $table->make(true);
+        }
+
+        return view('admin.statusControls.index');
     }
 
     public function create()

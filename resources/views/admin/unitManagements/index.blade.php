@@ -15,88 +15,39 @@
     </div>
 
     <div class="card-body">
-        <div class="table-responsive">
-            <table class=" table table-bordered table-striped table-hover datatable datatable-UnitManagement">
-                <thead>
-                    <tr>
-                        <th width="10">
+        <table class=" table table-bordered table-striped table-hover ajaxTable datatable datatable-UnitManagement">
+            <thead>
+                <tr>
+                    <th width="10">
 
-                        </th>
-                        <th>
-                            {{ trans('cruds.unitManagement.fields.id') }}
-                        </th>
-                        <th>
-                            {{ trans('cruds.unitManagement.fields.unit') }}
-                        </th>
-                        <th>
-                            {{ trans('cruds.addUnit.fields.floor') }}
-                        </th>
-                        <th>
-                            {{ trans('cruds.unitManagement.fields.owner') }}
-                        </th>
-                        <th>
-                            {{ trans('cruds.user.fields.email') }}
-                        </th>
-                        <th>
-                            {{ trans('cruds.unitManagement.fields.status') }}
-                        </th>
-                        <th>
-                            &nbsp;
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($unitManagements as $key => $unitManagement)
-                        <tr data-entry-id="{{ $unitManagement->id }}">
-                            <td>
-
-                            </td>
-                            <td>
-                                {{ $unitManagement->id ?? '' }}
-                            </td>
-                            <td>
-                                {{ $unitManagement->unit->unit ?? '' }}
-                            </td>
-                            <td>
-                                {{ $unitManagement->unit->floor ?? '' }}
-                            </td>
-                            <td>
-                                {{ $unitManagement->owner->name ?? '' }}
-                            </td>
-                            <td>
-                                {{ $unitManagement->owner->email ?? '' }}
-                            </td>
-                            <td>
-                                {{ App\Models\UnitManagement::STATUS_SELECT[$unitManagement->status] ?? '' }}
-                            </td>
-                            <td>
-                                @can('unit_management_show')
-                                    <a class="btn btn-xs btn-primary" href="{{ route('admin.unit-managements.show', $unitManagement->id) }}">
-                                        {{ trans('global.view') }}
-                                    </a>
-                                @endcan
-
-                                @can('unit_management_edit')
-                                    <a class="btn btn-xs btn-info" href="{{ route('admin.unit-managements.edit', $unitManagement->id) }}">
-                                        {{ trans('global.edit') }}
-                                    </a>
-                                @endcan
-
-                                @can('unit_management_delete')
-                                    <form action="{{ route('admin.unit-managements.destroy', $unitManagement->id) }}" method="POST" onsubmit="return confirm('{{ trans('global.areYouSure') }}');" style="display: inline-block;">
-                                        <input type="hidden" name="_method" value="DELETE">
-                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                        <input type="submit" class="btn btn-xs btn-danger" value="{{ trans('global.delete') }}">
-                                    </form>
-                                @endcan
-
-                            </td>
-
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                    </th>
+                    <th>
+                        {{ trans('cruds.unitManagement.fields.id') }}
+                    </th>
+                    <th>
+                        {{ trans('cruds.unitManagement.fields.unit') }}
+                    </th>
+                    <th>
+                        {{ trans('cruds.addUnit.fields.floor') }}
+                    </th>
+                    <th>
+                        {{ trans('cruds.unitManagement.fields.owner') }}
+                    </th>
+                    <th>
+                        {{ trans('cruds.user.fields.email') }}
+                    </th>
+                    <th>
+                        {{ trans('cruds.unitManagement.fields.status') }}
+                    </th>
+                    <th>
+                        {{ trans('cruds.unitManagement.fields.spa') }}
+                    </th>
+                    <th>
+                        &nbsp;
+                    </th>
+                </tr>
+            </thead>
+        </table>
     </div>
 </div>
 
@@ -109,14 +60,14 @@
     $(function () {
   let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
 @can('unit_management_delete')
-  let deleteButtonTrans = '{{ trans('global.datatables.delete') }}'
+  let deleteButtonTrans = '{{ trans('global.datatables.delete') }}';
   let deleteButton = {
     text: deleteButtonTrans,
     url: "{{ route('admin.unit-managements.massDestroy') }}",
     className: 'btn-danger',
     action: function (e, dt, node, config) {
-      var ids = $.map(dt.rows({ selected: true }).nodes(), function (entry) {
-          return $(entry).data('entry-id')
+      var ids = $.map(dt.rows({ selected: true }).data(), function (entry) {
+          return entry.id
       });
 
       if (ids.length === 0) {
@@ -138,18 +89,35 @@
   dtButtons.push(deleteButton)
 @endcan
 
-  $.extend(true, $.fn.dataTable.defaults, {
+  let dtOverrideGlobals = {
+    buttons: dtButtons,
+    processing: true,
+    serverSide: true,
+    retrieve: true,
+    aaSorting: [],
+    ajax: "{{ route('admin.unit-managements.index') }}",
+    columns: [
+      { data: 'placeholder', name: 'placeholder' },
+{ data: 'id', name: 'id' },
+{ data: 'unit_unit', name: 'unit.unit' },
+{ data: 'unit.floor', name: 'unit.floor' },
+{ data: 'owner_name', name: 'owner.name' },
+{ data: 'owner.email', name: 'owner.email' },
+{ data: 'status', name: 'status' },
+{ data: 'spa', name: 'spa', sortable: false, searchable: false },
+{ data: 'actions', name: '{{ trans('global.actions') }}' }
+    ],
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
     pageLength: 100,
-  });
-  let table = $('.datatable-UnitManagement:not(.ajaxTable)').DataTable({ buttons: dtButtons })
+  };
+  let table = $('.datatable-UnitManagement').DataTable(dtOverrideGlobals);
   $('a[data-toggle="tab"]').on('shown.bs.tab click', function(e){
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();
   });
   
-})
+});
 
 </script>
 @endsection
